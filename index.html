@@ -2,12 +2,16 @@
 <html>
   <head>
     <style>
+      .canvas-container {
+        padding: 50px;
+        margin: 0 auto;
+        width: 500px;
+      }
       #canvas {
         border: 1px solid #ccc;
         cursor: crosshair;
         display: block;
         height: 400px;
-        margin: 100px auto 0 auto;
         width: 600px;
       }
 
@@ -16,8 +20,6 @@
       .option li {
         display: inline-block;
         cursor: pointer;
-        height: 25px;
-        width: 25px;
       }
 
       .colors li {
@@ -25,6 +27,8 @@
         margin: 3px;
         text-align: center;
         vertical-align: middle;
+        height: 25px;
+        width: 25px;
       }
 
       .colors li.selected {
@@ -51,11 +55,12 @@
     </style>
   </head>
   <body>
-    <div><canvas id="canvas"></canvas></div>
+    <div class="canvas-container"><canvas id="canvas"></canvas></div>
     <button id="clear">Clear</button>
     <button id="replay">Replay</button>
     <ul class="colors option">
       <li data-color="black" class="selected"></li>
+      <li data-color="white"></li>
       <li data-color="red"></li>
       <li data-color="orange"></li>
       <li data-color="yellow"></li>
@@ -95,7 +100,6 @@
       });
 
       $('.sizes li').each(function() {
-        var maxSize = 25;
         var size = $(this).data('size');
         $('<div class="circle"></div>').css({
           width: size,

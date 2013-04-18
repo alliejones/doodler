@@ -13,7 +13,7 @@ function Canvas (settings) {
   this.ctx.lineJoin = 'round';
   this.ctx.strokeStyle = 'black';
 
-  $(this.el).on('mousedown', this.onMousedown.bind(this));
+  $(this.el).parent('.canvas-container').on('mousedown', this.onMousedown.bind(this));
   // fix canvas cursor in Chrome
   $(window).on('selectstart', function() { return false; });
   $(window).on('mousemove', this.onMousemove.bind(this));
