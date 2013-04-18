@@ -39,8 +39,8 @@ Canvas.prototype.replay = function() {
 };
 
 Canvas.prototype.redraw = function (node) {
-  console.log(node.data.func, node.data.x, node.data.y);
-  this['_'+node.data.func].apply(this, [node.data.x, node.data.y]);
+  console.log(node.data.func, node.data.args);
+  this['_'+node.data.func].apply(this, node.data.args);
 
   if (node.next) {
     window.setTimeout(function () {
@@ -63,6 +63,15 @@ Canvas.prototype.stopDrawing = function () {
   this.recordingLoop = null;
 };
 
+Canvas.prototype.setStrokeColor = function (color) {
+  this.recording.append({ func: 'setStrokeColor', args: [ color ]})
+  this._setStrokeColor(color);
+};
+
+Canvas.prototype._setStrokeColor = function (color) {
+  this.ctx.strokeStyle = color;
+};
+
 Canvas.prototype.draw = function() {
   var x = this.mouseCoords.x;
   var y = this.mouseCoords.y;
@@ -70,7 +79,7 @@ Canvas.prototype.draw = function() {
 };
 
 Canvas.prototype.beginPath = function () {
-  this.recording.append({ func: 'beginPath', x: null, y: null });
+  this.recording.append({ func: 'beginPath', args: []});
   this._beginPath();
 }
 
@@ -79,7 +88,7 @@ Canvas.prototype._beginPath = function () {
 }
 
 Canvas.prototype.moveTo = function (x, y) {
-  this.recording.append({ func: 'moveTo', x: x, y: y });
+  this.recording.append({ func: 'moveTo', args: [ x, y ]});
   this._moveTo(x, y);
 };
 
@@ -89,7 +98,7 @@ Canvas.prototype._moveTo = function (x, y) {
 };
 
 Canvas.prototype.lineTo = function (x, y) {
-  this.recording.append({ func: 'lineTo', x: x, y: y });
+  this.recording.append({ func: 'lineTo', args: [ x, y ]});
   this._lineTo(x, y);
 };
 

@@ -9,12 +9,32 @@
         margin: 100px auto 0 auto;
         width: 600px;
       }
+
+      .colors li {
+        border: 1px solid #ccc;
+        cursor: pointer;
+        display: inline-block;
+        height: 25px;
+        width: 25px;
+      }
     </style>
   </head>
   <body>
     <canvas id="canvas"></canvas>
     <button id="clear">Clear</button>
     <button id="replay">Replay</button>
+    <ul class="colors">
+      <li data-color="red"></li>
+      <li data-color="orange"></li>
+      <li data-color="yellow"></li>
+      <li data-color="blue"></li>
+      <li data-color="green"></li>
+      <li data-color="indigo"></li>
+      <li data-color="violet"></li>
+      <li data-color="black"></li>
+      <li data-color="white"></li>
+    </ul>
+
     <script src="jquery-1.7.1.min.js"></script>
     <script src="linkedlist.js"></script>
     <script src="script.js"></script>
@@ -26,6 +46,12 @@
       });
       $('#clear').on('click', function() { canvas.clear(); });
       $('#replay').on('click', function() { canvas.replay(); });
+
+      $('.colors li').css('backgroundColor', function() {
+        return $(this).data('color');
+      }).on('click', function() {
+        canvas.setStrokeColor($(this).data('color'));
+      });
     </script>
   </body>
 </head>
