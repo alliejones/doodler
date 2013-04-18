@@ -17,15 +17,15 @@ function Canvas (settings) {
   this.ctx.lineJoin = 'round';
   this.ctx.strokeStyle = 'black';
 
-  $(this.el).parent('.canvas-container').on('mousedown', this.onMousedown.bind(this));
+  $(this.el).parent('.canvas-container').on('mousedown', this._onMousedown.bind(this));
   // fix canvas cursor in Chrome
   $(window).on('selectstart', function() { return false; });
-  $(window).on('mousemove', this.onMousemove.bind(this));
-  $(window).on('mouseup', this.onMouseup.bind(this));
+  $(window).on('mousemove', this._onMousemove.bind(this));
+  $(window).on('mouseup', this._onMouseup.bind(this));
 }
 
 // map coordinates from window to canvas
-Canvas.prototype.mapCoords = function (x, y) {
+Canvas.prototype._mapCoords = function (x, y) {
   var boundingBox = this.el.getBoundingClientRect();
 
   return {
@@ -34,19 +34,19 @@ Canvas.prototype.mapCoords = function (x, y) {
   };
 };
 
-Canvas.prototype.onMousedown = function (e) { this.startDrawing(e); };
-Canvas.prototype.onMouseup = function () { this.stopDrawing(); };
+Canvas.prototype._onMousedown = function (e) { this._startDrawing(e); };
+Canvas.prototype._onMouseup = function () { this._stopDrawing(); };
 
-Canvas.prototype.onMousemove = function(e) {
-  this.curMouseCoords = this.mapCoords(e.pageX, e.pageY);
+Canvas.prototype._onMousemove = function(e) {
+  this.curMouseCoords = this._mapCoords(e.pageX, e.pageY);
 };
 
 Canvas.prototype.replay = function() {
   this._clear();
-  this.redraw(this.recording.head);
+  this._redraw(this.recording.head);
 };
 
-Canvas.prototype.redraw = function (node) {
+Canvas.prototype._redraw = function (node) {
   console.log(node.data[0], node.data[1], node.data[2]);
   this.setStrokeColor(node.data[2][0]);
   this.setStrokeWidth(node.data[2][1]);
@@ -54,21 +54,21 @@ Canvas.prototype.redraw = function (node) {
 
   if (node.next) {
     window.setTimeout(function () {
-      this.redraw(node.next);
+      this._redraw(node.next);
     }.bind(this), this.recordingInterval);
   } else {
     this.ctx.beginPath();
   }
 };
 
-Canvas.prototype.startDrawing = function (e) {
-  var coords = this.mapCoords(e.pageX, e.pageY);
-  this.recordingLoop = window.setInterval(this.draw.bind(this), this.recordingInterval);
+Canvas.prototype._startDrawing = function (e) {
+  var coords = this._mapCoords(e.pageX, e.pageY);
+  this.recordingLoop = window.setInterval(this._draw.bind(this), this.recordingInterval);
   this.ctx.moveTo(coords.x, coords.y);
   this.ctx.beginPath();
 };
 
-Canvas.prototype.stopDrawing = function () {
+Canvas.prototype._stopDrawing = function () {
   this.ctx.beginPath();
   this.prevMouseCoords = { x: null, y: null };
   this.mouseCoords = { x: null, y: null };
@@ -84,7 +84,7 @@ Canvas.prototype.setStrokeWidth = function (width) {
   this.ctx.lineWidth = width;
 };
 
-Canvas.prototype.draw = function() {
+Canvas.prototype._draw = function() {
   var x1 = this.prevMouseCoords.x = this.mouseCoords.x;
   var y1 = this.prevMouseCoords.y = this.mouseCoords.y;
   var x2 = this.mouseCoords.x = this.curMouseCoords.x;
