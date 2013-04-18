@@ -4,11 +4,14 @@
     <style>
       #canvas {
         border: 1px solid #ccc;
+        cursor: crosshair;
         display: block;
         height: 400px;
         margin: 100px auto 0 auto;
         width: 600px;
       }
+
+      #canvas:active, #canvas:focus { cursor: crosshair; }
 
       .colors li {
         border: 1px solid #ccc;
@@ -16,14 +19,21 @@
         display: inline-block;
         height: 25px;
         width: 25px;
+        margin: 3px;
+      }
+
+      .colors li.selected {
+        border-width: 4px;
+        margin: 0px;
       }
     </style>
   </head>
   <body>
-    <canvas id="canvas"></canvas>
+    <div><canvas id="canvas"></canvas></div>
     <button id="clear">Clear</button>
     <button id="replay">Replay</button>
     <ul class="colors">
+      <li data-color="black" class="selected"></li>
       <li data-color="red"></li>
       <li data-color="orange"></li>
       <li data-color="yellow"></li>
@@ -31,8 +41,6 @@
       <li data-color="green"></li>
       <li data-color="indigo"></li>
       <li data-color="violet"></li>
-      <li data-color="black"></li>
-      <li data-color="white"></li>
     </ul>
 
     <script src="jquery-1.7.1.min.js"></script>
@@ -51,6 +59,7 @@
         return $(this).data('color');
       }).on('click', function() {
         canvas.setStrokeColor($(this).data('color'));
+        $(this).addClass('selected').siblings().removeClass('selected');
       });
     </script>
   </body>

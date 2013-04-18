@@ -9,7 +9,9 @@ function Canvas (settings) {
   this.el.width = settings.width;
   this.el.height = settings.height;
 
-  $(window).on('mousedown', this.onMousedown.bind(this));
+  $(this.el).on('mousedown', this.onMousedown.bind(this));
+  // fix canvas cursor in Chrome
+  $(window).on('selectstart', function() { return false; });
   $(window).on('mousemove', this.onMousemove.bind(this));
   $(window).on('mouseup', this.onMouseup.bind(this));
 }
@@ -33,9 +35,7 @@ Canvas.prototype.onMousemove = function(e) {
 
 Canvas.prototype.replay = function() {
   this.clear();
-  var node = this.recording.head;
-  this._moveTo(node.data.x, node.data.y);
-  this.redraw(node.next);
+  this.redraw(this.recording.head);
 };
 
 Canvas.prototype.redraw = function (node) {
