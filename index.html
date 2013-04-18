@@ -13,18 +13,40 @@
 
       #canvas:active, #canvas:focus { cursor: crosshair; }
 
-      .colors li {
-        border: 1px solid #ccc;
-        cursor: pointer;
+      .option li {
         display: inline-block;
+        cursor: pointer;
         height: 25px;
         width: 25px;
+      }
+
+      .colors li {
+        border: 1px solid #ccc;
         margin: 3px;
+        text-align: center;
+        vertical-align: middle;
       }
 
       .colors li.selected {
         border-width: 4px;
         margin: 0px;
+      }
+
+      .sizes li {
+        width: 40px;
+        height: 40px;
+      }
+
+      .sizes li .circle {
+        border: 4px solid transparent;
+        background: #000;
+        border-radius: 50%;
+        display: inline-block;
+        background-clip: content-box;
+      }
+
+      .sizes li.selected .circle {
+        border: 4px solid #ccc;
       }
     </style>
   </head>
@@ -32,7 +54,7 @@
     <div><canvas id="canvas"></canvas></div>
     <button id="clear">Clear</button>
     <button id="replay">Replay</button>
-    <ul class="colors">
+    <ul class="colors option">
       <li data-color="black" class="selected"></li>
       <li data-color="red"></li>
       <li data-color="orange"></li>
@@ -41,6 +63,16 @@
       <li data-color="green"></li>
       <li data-color="indigo"></li>
       <li data-color="violet"></li>
+    </ul>
+
+    <ul class="sizes option">
+      <li data-size="1"></li>
+      <li data-size="5" class="selected"></li>
+      <li data-size="10"></li>
+      <li data-size="15"></li>
+      <li data-size="20"></li>
+      <li data-size="35"></li>
+      <li data-size="50"></li>
     </ul>
 
     <script src="jquery-1.7.1.min.js"></script>
@@ -59,6 +91,18 @@
         return $(this).data('color');
       }).on('click', function() {
         canvas.setStrokeColor($(this).data('color'));
+        $(this).addClass('selected').siblings().removeClass('selected');
+      });
+
+      $('.sizes li').each(function() {
+        var maxSize = 25;
+        var size = $(this).data('size');
+        $('<div class="circle"></div>').css({
+          width: size,
+          height: size
+        }).appendTo($(this));
+      }).on('click', function() {
+        canvas.setStrokeWidth($(this).data('size'));
         $(this).addClass('selected').siblings().removeClass('selected');
       });
     </script>

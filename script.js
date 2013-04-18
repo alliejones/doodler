@@ -9,6 +9,10 @@ function Canvas (settings) {
   this.el.width = settings.width;
   this.el.height = settings.height;
 
+  this.ctx.lineCap = 'round';
+  this.ctx.lineJoin = 'round';
+  this.ctx.strokeStyle = 'black';
+
   $(this.el).on('mousedown', this.onMousedown.bind(this));
   // fix canvas cursor in Chrome
   $(window).on('selectstart', function() { return false; });
@@ -72,6 +76,15 @@ Canvas.prototype._setStrokeColor = function (color) {
   this.ctx.strokeStyle = color;
 };
 
+Canvas.prototype.setStrokeWidth = function (width) {
+  this.recording.append({ func: 'setStrokeWidth', args: [ width ]})
+  this._setStrokeWidth(width);
+};
+
+Canvas.prototype._setStrokeWidth = function (width) {
+  this.ctx.lineWidth = width;
+};
+
 Canvas.prototype.draw = function() {
   var x = this.mouseCoords.x;
   var y = this.mouseCoords.y;
@@ -88,7 +101,7 @@ Canvas.prototype._beginPath = function () {
 }
 
 Canvas.prototype.moveTo = function (x, y) {
-  this.recording.append({ func: 'moveTo', args: [ x, y ]});
+  this.recording.append({ func: 'moveTo', args: [ Math.floor(x), Math.floor(y) ]});
   this._moveTo(x, y);
 };
 
@@ -98,7 +111,7 @@ Canvas.prototype._moveTo = function (x, y) {
 };
 
 Canvas.prototype.lineTo = function (x, y) {
-  this.recording.append({ func: 'lineTo', args: [ x, y ]});
+  this.recording.append({ func: 'lineTo', args: [ Math.floor(x), Math.floor(y) ]});
   this._lineTo(x, y);
 };
 

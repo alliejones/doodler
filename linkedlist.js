@@ -34,6 +34,16 @@ LinkedList.prototype.print = function () {
   while (curr) {
     data.push(curr.data);
     curr = curr.next;
-  };
-  console.log(data.join(', '));
+  }
+  return data.join(', ');
+}
+
+LinkedList.prototype.toJSON = function () {
+  var curr = this.head;
+  var nodes = [];
+  while (curr) {
+    nodes.push(curr.data);
+    curr = curr.next;
+  }
+  return nodes;
 }
