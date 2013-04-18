@@ -42,15 +42,15 @@ Canvas.prototype.onMousemove = function(e) {
 };
 
 Canvas.prototype.replay = function() {
-  this.clear();
+  this._clear();
   this.redraw(this.recording.head);
 };
 
 Canvas.prototype.redraw = function (node) {
-  console.log(node.data.func, node.data.args, node.data.settings);
-  this.setStrokeWidth(node.data.settings.strokeWidth);
-  this.setStrokeColor(node.data.settings.strokeColor);
-  this['_'+node.data.func].apply(this, node.data.args);
+  console.log(node.data[0], node.data[1], node.data[2]);
+  this.setStrokeColor(node.data[2][0]);
+  this.setStrokeWidth(node.data[2][1]);
+  this['_'+node.data[0]].apply(this, node.data[1]);
 
   if (node.next) {
     window.setTimeout(function () {
@@ -97,7 +97,7 @@ Canvas.prototype.draw = function() {
 };
 
 Canvas.prototype.line = function (x1, y1, x2, y2) {
-  this.recording.append({ func: 'line', args: [ Math.floor(x1), Math.floor(y1), Math.floor(x2), Math.floor(y2) ], settings: { strokeColor: this.ctx.strokeStyle, strokeWidth: this.ctx.lineWidth }});
+  this.recording.append([ 'line', [ Math.floor(x1), Math.floor(y1), Math.floor(x2), Math.floor(y2) ], [ this.ctx.strokeStyle, this.ctx.lineWidth ]]);
   this._line(x1, y1, x2, y2);
 };
 
@@ -109,6 +109,10 @@ Canvas.prototype._line = function (x1, y1, x2, y2) {
 };
 
 Canvas.prototype.clear = function () {
+  this.recording = new LinkedList();
+  this._clear();
+};
+
+Canvas.prototype._clear = function () {
   this.ctx.clearRect(0, 0, this.el.width, this.el.height);
-  this.ctx.beginPath();
 };
