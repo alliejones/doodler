@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+  <head>
+    <style>
+      #canvas {
+        border: 1px solid #ccc;
+        display: block;
+        height: 400px;
+        margin: 100px auto 0 auto;
+        width: 600px;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+    <button id="clear">Clear</button>
+    <button id="replay">Replay</button>
+    <script src="jquery-1.7.1.min.js"></script>
+    <script src="linkedlist.js"></script>
+    <script src="script.js"></script>
+    <script>
+      var canvas = new Canvas({
+        width: 600,
+        height: 400,
+        id: 'canvas'
+      });
+      $('#clear').on('click', function() { canvas.clear(); });
+      $('#replay').on('click', function() { canvas.replay(); });
+    </script>
+  </body>
+</head>
