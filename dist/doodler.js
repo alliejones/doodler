@@ -1,3 +1,53 @@
+function Node (data) {
+  return {
+    data: data,
+    next: null
+  };
+}
+
+function LinkedList () {
+  this.head = null;
+  this.tail = null;
+  this.size = 0;
+}
+
+LinkedList.prototype.prepend = function(data) {
+  var node = new Node(data);
+  node.next = this.head;
+  this.head = node;
+  this.size += 1;
+};
+
+LinkedList.prototype.append = function(data) {
+  var node = new Node(data);
+
+  if (!this.head) { this.head = node; this.tail = node; }
+  else { this.tail.next = node; }
+
+  this.tail = node;
+  this.size += 1;
+};
+
+LinkedList.prototype.print = function () {
+  var curr = this.head;
+  var data = [];
+  while (curr) {
+    data.push(curr.data);
+    curr = curr.next;
+  }
+  return data.join(', ');
+};
+
+LinkedList.prototype.toJSON = function () {
+  var curr = this.head;
+  var nodes = [];
+  while (curr) {
+    nodes.push(curr.data);
+    curr = curr.next;
+  }
+  return nodes;
+};
+
 function Canvas (settings) {
   this.el = document.getElementById(settings.id);
   this.ctx = this.el.getContext('2d');
@@ -47,7 +97,7 @@ Canvas.prototype.replay = function() {
 };
 
 Canvas.prototype._redraw = function (node) {
-  console.log(node.data[0], node.data[1], node.data[2]);
+  // data: 0: function, 1: function args, 2: canvas state
   this.setStrokeColor(node.data[2][0]);
   this.setStrokeWidth(node.data[2][1]);
   this['_'+node.data[0]].apply(this, node.data[1]);

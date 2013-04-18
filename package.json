@@ -1,0 +1,17 @@
+{
+  "name": "doodler",
+  "version": "0.0.1",
+  "description": "A HTML5 canvas drawing application that supports recording and playback",
+  "main": "",
+  "scripts": {
+    "test": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/alliejones/doodler.git"
+  },
+  "author": "Allie Jones",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "gitHead": "82a632b3bfdd415cd352cdabca0e658ecb662c13"
+}

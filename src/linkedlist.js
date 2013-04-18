@@ -2,7 +2,7 @@ function Node (data) {
   return {
     data: data,
     next: null
-  }
+  };
 }
 
 function LinkedList () {
@@ -36,7 +36,7 @@ LinkedList.prototype.print = function () {
     curr = curr.next;
   }
   return data.join(', ');
-}
+};
 
 LinkedList.prototype.toJSON = function () {
   var curr = this.head;
@@ -46,4 +46,4 @@ LinkedList.prototype.toJSON = function () {
     curr = curr.next;
   }
   return nodes;
-}
+};
