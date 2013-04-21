@@ -38,7 +38,7 @@ Canvas.prototype._onMousedown = function (e) { this._startDrawing(e); };
 Canvas.prototype._onMouseup = function () { this._stopDrawing(); };
 
 Canvas.prototype._onMousemove = function(e) {
-  this.curMouseCoords = this._mapCoords(e.pageX, e.pageY);
+  this.curMouseCoords = this._mapCoords(e.pageX - $(window).scrollLeft(), e.pageY - $(window).scrollTop());
 };
 
 Canvas.prototype.replay = function() {
