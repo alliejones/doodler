@@ -11,6 +11,13 @@ function LinkedList () {
   this.size = 0;
 }
 
+LinkedList.prototype.fromJSON = function(jsonString) {
+  var data = JSON.parse(jsonString);
+  for (var i = 0, length = data.length; i < length; i++) {
+    this.append(data[i]);
+  }
+};
+
 LinkedList.prototype.prepend = function(data) {
   var node = new Node(data);
   node.next = this.head;

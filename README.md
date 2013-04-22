@@ -10,11 +10,14 @@ An HTML canvas drawing application that supports recording and playback.
 var canvas = new Canvas({
   id: 'canvas',
   height: 300,
-  width: 500
+  width: 500,
+  readOnly: false
 });
 ```
 
 The script expects a div element with an ID (which you specify in the initial settings) that will be used as a wrapper for the actual canvas element which will be created automatically.
+
+`readOnly` is the only optional setting. Its default is `false` (that is, the canvas can be drawn on by default).
 
 The mousedown event which triggers drawing is attached to the wrapper element, so adding some padding to the wrapper element will make the drawing behavior more user-friendly (since it makes it possible to start drawing slightly off-canvas).
 
@@ -33,8 +36,19 @@ Sets the stroke color. Accepts any valid CSS3 color value.
 `canvas.setStrokeWidth(width)`  
 Sets the stroke width. Width should be an integer (no `px` suffix).
 
-`canvas.clear()`  
-Clears the canvas and the recording.
+`canvas.translate(x, y)`  
+Move the origin of the canvas. The point `(x, y)` will become `(0, 0)`. Saves the previous state of the canvas to the state stack, so the transformation can be reversed with `undoTranslation`.
+
+ (This is generally only useful when replaying. Transforming the canvas when a user is drawing will offset the drawn line from the cursor position.)
+
+`canvas.undoTranslation()`  
+Undo the effects of the last `translation` function.
+
+`canvas.erase()`  
+Clears the canvas (but drawing history is preserved).
+
+`canvas.clearHistory()`
+Discard the drawing history.
 
 `canvas.replay()`  
-Clears the canvas and replays what has been recorded.
+Replay the drawing history. (Does not automatically clear the canvas.)

@@ -37,8 +37,8 @@
         height: 400,
         id: 'canvas'
       });
-      $('#clear').on('click', function() { canvas.clear(); });
-      $('#replay').on('click', function() { canvas.replay(); });
+      $('#clear').on('click', function() { canvas.erase(); canvas.clearHistory(); });
+      $('#replay').on('click', function() { canvas.erase(); canvas.replay(); });
 
       $('.colors li').css('backgroundColor', function() {
         return $(this).data('color');

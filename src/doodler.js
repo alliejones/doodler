@@ -19,11 +19,13 @@ function Canvas (settings) {
   this.ctx.lineJoin = 'round';
   this.ctx.strokeStyle = 'black';
 
-  this.ctr.addEventListener('mousedown', this._onMousedown.bind(this));
-  // fix canvas cursor in Chrome
-  window.addEventListener('selectstart', function() { return false; });
-  window.addEventListener('mousemove', this._onMousemove.bind(this));
-  window.addEventListener('mouseup', this._onMouseup.bind(this));
+  if (!settings.readOnly) {
+    this.ctr.addEventListener('mousedown', this._onMousedown.bind(this));
+    // fix canvas cursor in Chrome
+    window.addEventListener('selectstart', function() { return false; });
+    window.addEventListener('mousemove', this._onMousemove.bind(this));
+    window.addEventListener('mouseup', this._onMouseup.bind(this));
+  }
 }
 
 // map coordinates from window to canvas
@@ -53,7 +55,6 @@ Canvas.prototype._windowScrollPosition = function() {
 };
 
 Canvas.prototype.replay = function() {
-  this._clear();
   this._redraw(this.recording.head);
 };
 
@@ -119,11 +120,33 @@ Canvas.prototype._line = function (x1, y1, x2, y2) {
   this.ctx.stroke();
 };
 
-Canvas.prototype.clear = function () {
-  this.recording = new LinkedList();
-  this._clear();
+Canvas.prototype.translate = function (x, y) {
+  this.recording.append([ 'translate', [ x, y ], [] ]);
+  this._translate(x, y);
 };
 
-Canvas.prototype._clear = function () {
+Canvas.prototype._translate = function (x, y) {
+  this.ctx.save();
+  this.ctx.translate(x, y);
+};
+
+Canvas.prototype.undoTranslation = function () {
+  this.recording.append([ 'clearTranslation', [], [] ]);
+  this._clearTranslation();
+};
+
+Canvas.prototype._undoTranslation = function () {
+  this.ctx.restore();
+};
+
+Canvas.prototype.clearHistory = function () {
+  this.recording = new LinkedList();
+};
+
+Canvas.prototype.erase = function () {
   this.ctx.clearRect(0, 0, this.el.width, this.el.height);
+};
+
+Canvas.prototype.fromJSON = function (data) {
+  this.recording.fromJSON(data);
 };
