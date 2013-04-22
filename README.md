@@ -28,7 +28,7 @@ The mousedown event which triggers drawing is attached to the wrapper element, s
 ### Methods
 
 `canvas.line(x1, y1, x2, y2)`  
-Draws a line between the points `x1, y1` and `x2, y2` with the current canvas state (stroke width and color).
+Draws a line between the points `(x1, y1)` and `(x2, y2)` with the current canvas state (stroke width and color).
 
 `canvas.setStrokeColor(color)`  
 Sets the stroke color. Accepts any valid CSS3 color value.
@@ -37,18 +37,21 @@ Sets the stroke color. Accepts any valid CSS3 color value.
 Sets the stroke width. Width should be an integer (no `px` suffix).
 
 `canvas.translate(x, y)`  
-Move the origin of the canvas. The point `(x, y)` will become `(0, 0)`. Saves the previous state of the canvas to the state stack, so the transformation can be reversed with `undoTranslation`.
+Move the origin of the canvas. The point `(x, y)` will become `(0, 0)`. Saves the previous state of the canvas to the state stack, so the transformation can be reversed with `undoTranslation`. Translations are not added to the recording.
 
  (This is generally only useful when replaying. Transforming the canvas when a user is drawing will offset the drawn line from the cursor position.)
 
-`canvas.undoTranslation()`  
-Undo the effects of the last `translation` function.
+`canvas.undoTranslate()`  
+Undo the effects of the last `translate` call.
 
 `canvas.erase()`  
 Clears the canvas (but drawing history is preserved).
 
-`canvas.clearHistory()`
+`canvas.newHistory()`  
 Discard the drawing history.
 
 `canvas.replay()`  
 Replay the drawing history. (Does not automatically clear the canvas.)
+
+`canvas.fromJSON(jsonString)`  
+Append the drawing events represented in `jsonString` to the canvas history.

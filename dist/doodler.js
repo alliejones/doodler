@@ -145,21 +145,11 @@ Canvas.prototype._line = function (x1, y1, x2, y2) {
 };
 
 Canvas.prototype.translate = function (x, y) {
-  this.recording.append([ 'translate', [ x, y ], [] ]);
-  this._translate(x, y);
-};
-
-Canvas.prototype._translate = function (x, y) {
   this.ctx.save();
   this.ctx.translate(x, y);
 };
 
-Canvas.prototype.undoTranslation = function () {
-  this.recording.append([ 'clearTranslation', [], [] ]);
-  this._clearTranslation();
-};
-
-Canvas.prototype._undoTranslation = function () {
+Canvas.prototype.undoTranslate = function () {
   this.ctx.restore();
 };
 
