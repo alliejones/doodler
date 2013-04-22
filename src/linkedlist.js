@@ -54,3 +54,19 @@ LinkedList.prototype.toJSON = function () {
   }
   return nodes;
 };
+
+LinkedList.prototype.forEachTimeout = function(func, timeout) {
+  if (this.head !== null) {
+    _eachNodeTimeout(this.head, func, timeout);
+  }
+};
+
+function _eachNodeTimeout(node, func, timeout) {
+  func(node.data);
+
+  if (node.next) {
+    window.setTimeout(function() {
+      _eachNodeTimeout(node.next, func, timeout);
+    }, timeout);
+  }
+}

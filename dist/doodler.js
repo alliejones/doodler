@@ -55,6 +55,21 @@ LinkedList.prototype.toJSON = function () {
   return nodes;
 };
 
+LinkedList.prototype.forEachTimeout = function(func, timeout) {
+  if (this.head !== null) {
+    _eachNodeTimeout(this.head, func, timeout);
+  }
+};
+
+function _eachNodeTimeout(node, func, timeout) {
+  func(node.data);
+
+  if (node.next) {
+    window.setTimeout(function() {
+      _eachNodeTimeout(node.next, func, timeout);
+    }, timeout);
+  }
+}
 function Canvas (settings) {
   this.el = document.createElement('canvas');
   this.ctr = document.getElementById(settings.id);
@@ -112,22 +127,11 @@ Canvas.prototype._windowScrollPosition = function() {
 };
 
 Canvas.prototype.replay = function() {
-  this._redraw(this.recording.head);
-};
-
-Canvas.prototype._redraw = function (node) {
-  // data: 0: function, 1: function args, 2: canvas state
-  this.setStrokeColor(node.data[2][0]);
-  this.setStrokeWidth(node.data[2][1]);
-  this['_'+node.data[0]].apply(this, node.data[1]);
-
-  if (node.next) {
-    window.setTimeout(function () {
-      this._redraw(node.next);
-    }.bind(this), this.recordingInterval);
-  } else {
-    this.ctx.beginPath();
-  }
+  this.recording.forEachTimeout(function (data) {
+    this.setStrokeColor(data[2][0]);
+    this.setStrokeWidth(data[2][1]);
+    this['_'+data[0]].apply(this, data[1]);
+  }.bind(this), this.recordingInterval);
 };
 
 Canvas.prototype._startDrawing = function (e) {
