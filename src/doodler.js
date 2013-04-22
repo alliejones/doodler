@@ -1,6 +1,8 @@
 function Canvas (settings) {
-  this.el = document.getElementById(settings.id);
+  this.el = document.createElement('canvas');
+  this.ctr = document.getElementById(settings.id);
   this.ctx = this.el.getContext('2d');
+  this.ctr.appendChild(this.el);
 
   this.prevMouseCoords = { x: null, y: null };
   this.mouseCoords = { x: null, y: null };
@@ -17,11 +19,11 @@ function Canvas (settings) {
   this.ctx.lineJoin = 'round';
   this.ctx.strokeStyle = 'black';
 
-  $(this.el).parent('.canvas-container').on('mousedown', this._onMousedown.bind(this));
+  this.ctr.addEventListener('mousedown', this._onMousedown.bind(this));
   // fix canvas cursor in Chrome
-  $(window).on('selectstart', function() { return false; });
-  $(window).on('mousemove', this._onMousemove.bind(this));
-  $(window).on('mouseup', this._onMouseup.bind(this));
+  window.addEventListener('selectstart', function() { return false; });
+  window.addEventListener('mousemove', this._onMousemove.bind(this));
+  window.addEventListener('mouseup', this._onMouseup.bind(this));
 }
 
 // map coordinates from window to canvas
@@ -38,7 +40,16 @@ Canvas.prototype._onMousedown = function (e) { this._startDrawing(e); };
 Canvas.prototype._onMouseup = function () { this._stopDrawing(); };
 
 Canvas.prototype._onMousemove = function(e) {
-  this.curMouseCoords = this._mapCoords(e.pageX - $(window).scrollLeft(), e.pageY - $(window).scrollTop());
+  var scroll = this._windowScrollPosition();
+  this.curMouseCoords = this._mapCoords(e.pageX - scroll.left, e.pageY - scroll.top);
+};
+
+Canvas.prototype._windowScrollPosition = function() {
+  var doc = document.documentElement;
+  var body = document.body;
+  var left = (doc && doc.scrollLeft || body && body.scrollLeft || 0);
+  var top = (doc && doc.scrollTop  || body && body.scrollTop  || 0);
+  return { left: left, top: top };
 };
 
 Canvas.prototype.replay = function() {

@@ -6,8 +6,6 @@ An HTML canvas drawing application that supports recording and playback.
 
 ### Setup
 
-Doodler requires jQuery.
-
 ```js
 var canvas = new Canvas({
   id: 'canvas',
@@ -16,12 +14,12 @@ var canvas = new Canvas({
 });
 ```
 
-The script expects a canvas element with an ID (which you specify in the initial settings) wrapped in an element with the class `canvas-container` (this makes drawing off-canvas behave better).
+The script expects a div element with an ID (which you specify in the initial settings) that will be used as a wrapper for the actual canvas element which will be created automatically.
+
+The mousedown event which triggers drawing is attached to the wrapper element, so adding some padding to the wrapper element will make the drawing behavior more user-friendly (since it makes it possible to start drawing slightly off-canvas).
 
 ```html
-<div class="canvas-container">
-  <div id="canvas"></div>
-</div>
+<div id="canvas"></div>
 ```
 
 ### Methods
