@@ -8,8 +8,8 @@ function Canvas (settings) {
   this.mouseCoords = { x: null, y: null };
   this.curMouseCoords = { x: null, y: null };
 
+  this.newHistory();
   this.recordingLoop = null;
-  this.recording = new LinkedList();
   this.recordingInterval = 10; // ms
 
   this.el.width = settings.width;
@@ -128,8 +128,8 @@ Canvas.prototype._undoTranslation = function () {
   this.ctx.restore();
 };
 
-Canvas.prototype.clearHistory = function () {
-  this.recording = new LinkedList();
+Canvas.prototype.newHistory = function () {
+  this.recording = new Recording();
 };
 
 Canvas.prototype.erase = function () {

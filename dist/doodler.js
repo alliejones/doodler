@@ -1,75 +1,38 @@
-function Node (data) {
-  return {
-    data: data,
-    next: null
-  };
+function Recording () {
+  this.array = [];
 }
 
-function LinkedList () {
-  this.head = null;
-  this.tail = null;
-  this.size = 0;
-}
-
-LinkedList.prototype.fromJSON = function(jsonString) {
+Recording.prototype.fromJSON = function(jsonString) {
   var data = JSON.parse(jsonString);
   for (var i = 0, length = data.length; i < length; i++) {
     this.append(data[i]);
   }
 };
 
-LinkedList.prototype.prepend = function(data) {
-  var node = new Node(data);
-  node.next = this.head;
-  this.head = node;
-  this.size += 1;
+Recording.prototype.append = function(data) {
+  this.array.push(data);
 };
 
-LinkedList.prototype.append = function(data) {
-  var node = new Node(data);
-
-  if (!this.head) { this.head = node; this.tail = node; }
-  else { this.tail.next = node; }
-
-  this.tail = node;
-  this.size += 1;
+Recording.prototype.toJSON = function () {
+  return this.array;
 };
 
-LinkedList.prototype.print = function () {
-  var curr = this.head;
-  var data = [];
-  while (curr) {
-    data.push(curr.data);
-    curr = curr.next;
-  }
-  return data.join(', ');
-};
-
-LinkedList.prototype.toJSON = function () {
-  var curr = this.head;
-  var nodes = [];
-  while (curr) {
-    nodes.push(curr.data);
-    curr = curr.next;
-  }
-  return nodes;
-};
-
-LinkedList.prototype.forEachTimeout = function(func, timeout) {
-  if (this.head !== null) {
-    _eachNodeTimeout(this.head, func, timeout);
+Recording.prototype.forEachTimeout = function(func, timeout) {
+  if (this.array.length !== 0) {
+    this._eachElTimeout(0, func, timeout);
   }
 };
 
-function _eachNodeTimeout(node, func, timeout) {
-  func(node.data);
+Recording.prototype._eachElTimeout = function(index, func, timeout) {
+  func(this.array[index]);
 
-  if (node.next) {
+  if (this.array.length > index + 1) {
     window.setTimeout(function() {
-      _eachNodeTimeout(node.next, func, timeout);
-    }, timeout);
+      this._eachElTimeout(index + 1, func, timeout);
+    }.bind(this), timeout);
   }
-}
+};
+
 function Canvas (settings) {
   this.el = document.createElement('canvas');
   this.ctr = document.getElementById(settings.id);
@@ -80,8 +43,8 @@ function Canvas (settings) {
   this.mouseCoords = { x: null, y: null };
   this.curMouseCoords = { x: null, y: null };
 
+  this.newHistory();
   this.recordingLoop = null;
-  this.recording = new LinkedList();
   this.recordingInterval = 10; // ms
 
   this.el.width = settings.width;
@@ -200,8 +163,8 @@ Canvas.prototype._undoTranslation = function () {
   this.ctx.restore();
 };
 
-Canvas.prototype.clearHistory = function () {
-  this.recording = new LinkedList();
+Canvas.prototype.newHistory = function () {
+  this.recording = new Recording();
 };
 
 Canvas.prototype.erase = function () {

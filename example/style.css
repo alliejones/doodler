@@ -1,10 +1,10 @@
-.canvas-container {
+#canvas {
   padding: 50px;
   margin: 0 auto;
   width: 500px;
 }
 
-#canvas {
+#canvas canvas {
   border: 1px solid #ccc;
   cursor: crosshair;
   display: block;
@@ -12,7 +12,7 @@
   width: 600px;
 }
 
-#canvas:active, #canvas:focus { cursor: crosshair; }
+#canvas canvas:active, #canvas canvas:focus { cursor: crosshair; }
 
 .option li {
   display: inline-block;

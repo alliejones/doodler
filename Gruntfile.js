@@ -1,7 +1,7 @@
 module.exports = function(grunt) {
   var defaultTasks = ['jshint', 'concat', 'uglify']; // used for watch as well
 
-  var files = [ 'src/linkedlist.js', 'src/doodler.js' ];
+  var files = [ 'src/recording.js', 'src/doodler.js' ];
 
   grunt.initConfig({
     jshint: {
