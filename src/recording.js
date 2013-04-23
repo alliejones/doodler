@@ -2,8 +2,8 @@ function Recording () {
   this.array = [];
 }
 
-Recording.prototype.fromJSON = function(jsonString) {
-  var data = JSON.parse(jsonString);
+Recording.prototype.fromString = function(dataString) {
+  var data = dataString.split(',');
   for (var i = 0, length = data.length; i < length; i++) {
     this.append(data[i]);
   }
@@ -13,8 +13,8 @@ Recording.prototype.append = function(data) {
   this.array.push(data);
 };
 
-Recording.prototype.toJSON = function () {
-  return this.array;
+Recording.prototype.toString = function () {
+  return this.array.join(';');
 };
 
 Recording.prototype.forEachTimeout = function(func, timeout) {

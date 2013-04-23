@@ -2,8 +2,8 @@ function Recording () {
   this.array = [];
 }
 
-Recording.prototype.fromJSON = function(jsonString) {
-  var data = JSON.parse(jsonString);
+Recording.prototype.fromString = function(dataString) {
+  var data = dataString.split(',');
   for (var i = 0, length = data.length; i < length; i++) {
     this.append(data[i]);
   }
@@ -13,8 +13,8 @@ Recording.prototype.append = function(data) {
   this.array.push(data);
 };
 
-Recording.prototype.toJSON = function () {
-  return this.array;
+Recording.prototype.toString = function () {
+  return this.array.join(';');
 };
 
 Recording.prototype.forEachTimeout = function(func, timeout) {
@@ -54,6 +54,10 @@ function Canvas (settings) {
   this.ctx.lineJoin = 'round';
   this.ctx.strokeStyle = 'black';
 
+  this.cmds = [];
+  this.colors = {};
+  this.widths = {};
+
   if (!settings.readOnly) {
     this.ctr.addEventListener('mousedown', this._onMousedown.bind(this));
     // fix canvas cursor in Chrome
@@ -91,9 +95,17 @@ Canvas.prototype._windowScrollPosition = function() {
 
 Canvas.prototype.replay = function() {
   this.recording.forEachTimeout(function (data) {
-    this.setStrokeColor(data[2][0]);
-    this.setStrokeWidth(data[2][1]);
-    this['_'+data[0]].apply(this, data[1]);
+    data = data.toString().split(',');
+    if (data.length === 4) {
+      // this is a line, draw it
+      this._line.apply(this, data);
+    } else {
+      // a single number represents a command
+      var cmd = this.cmds[data[0]];
+      var func = '_' + cmd.shift();
+      console.log(func, cmd);
+      this[func].apply(this, cmd);
+    }
   }.bind(this), this.recordingInterval);
 };
 
@@ -113,12 +125,39 @@ Canvas.prototype._stopDrawing = function () {
 };
 
 Canvas.prototype.setStrokeColor = function (color) {
+  this.recording.append(this.colors[color]);
+  this._setStrokeColor(color);
+};
+
+Canvas.prototype._setStrokeColor = function (color) {
   this.ctx.strokeStyle = color;
 };
 
+Canvas.prototype.registerStrokeColor = function(color) {
+  if (!this.colors.hasOwnProperty(color)) {
+    this.cmds.push([ 'setStrokeColor', color ]);
+    // save the cmd index so it canbe looked up by color
+    this.colors[color] = this.cmds.length - 1;
+  }
+};
+
 Canvas.prototype.setStrokeWidth = function (width) {
+  this.recording.append(this.widths[width]);
+  this._setStrokeWidth(width);
+};
+
+Canvas.prototype._setStrokeWidth = function (width) {
   this.ctx.lineWidth = width;
 };
+
+Canvas.prototype.registerStrokeWidth = function(width) {
+  if (!this.widths.hasOwnProperty(width)) {
+    this.cmds.push([ 'setStrokeWidth', width ]);
+    // save the cmd index so it can be looked up by width
+    this.widths[width] = this.cmds.length - 1;
+  }
+};
+
 
 Canvas.prototype._draw = function() {
   var x1 = this.prevMouseCoords.x = this.mouseCoords.x;
@@ -133,7 +172,7 @@ Canvas.prototype._draw = function() {
 };
 
 Canvas.prototype.line = function (x1, y1, x2, y2) {
-  this.recording.append([ 'line', [ Math.floor(x1), Math.floor(y1), Math.floor(x2), Math.floor(y2) ], [ this.ctx.strokeStyle, this.ctx.lineWidth ]]);
+  this.recording.append([ Math.floor(x1), Math.floor(y1), Math.floor(x2), Math.floor(y2) ].join(','));
   this._line(x1, y1, x2, y2);
 };
 
@@ -161,6 +200,6 @@ Canvas.prototype.erase = function () {
   this.ctx.clearRect(0, 0, this.el.width, this.el.height);
 };
 
-Canvas.prototype.fromJSON = function (data) {
-  this.recording.fromJSON(data);
+Canvas.prototype.fromString = function (data) {
+  this.recording.fromString(data);
 };
