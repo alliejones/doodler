@@ -1,36 +1,28 @@
-function Recording () {
+function Queue () {
   this.array = [];
 }
 
-Recording.prototype.fromString = function(dataString) {
+Queue.prototype.fromString = function(dataString) {
   var data = dataString.split(',');
   for (var i = 0, length = data.length; i < length; i++) {
-    this.append(data[i]);
+    this.queue(data[i]);
   }
 };
 
-Recording.prototype.append = function(data) {
+Queue.prototype.dequeue = function() {
+  return this.array.shift();
+};
+
+Queue.prototype.queue = function(data) {
   this.array.push(data);
 };
 
-Recording.prototype.toString = function () {
+Queue.prototype.toString = function () {
   return this.array.join(';');
 };
 
-Recording.prototype.forEachTimeout = function(func, timeout) {
-  if (this.array.length !== 0) {
-    this._eachElTimeout(0, func, timeout);
-  }
-};
-
-Recording.prototype._eachElTimeout = function(index, func, timeout) {
-  func(this.array[index]);
-
-  if (this.array.length > index + 1) {
-    window.setTimeout(function() {
-      this._eachElTimeout(index + 1, func, timeout);
-    }.bind(this), timeout);
-  }
+Queue.prototype.isEmpty = function () {
+  return this.array.length <= 0;
 };
 
 function Canvas (settings) {
@@ -43,16 +35,15 @@ function Canvas (settings) {
   this.mouseCoords = { x: null, y: null };
   this.curMouseCoords = { x: null, y: null };
 
-  this.newHistory();
-  this.recordingLoop = null;
-  this.recordingInterval = 10; // ms
-
   this.el.width = settings.width;
   this.el.height = settings.height;
 
   this.ctx.lineCap = 'round';
   this.ctx.lineJoin = 'round';
   this.ctx.strokeStyle = 'black';
+
+  this.newHistory();
+  this.queues = [ this.queue ];
 
   this.cmds = [];
   this.colors = {};
@@ -65,7 +56,34 @@ function Canvas (settings) {
     window.addEventListener('mousemove', this._onMousemove.bind(this));
     window.addEventListener('mouseup', this._onMouseup.bind(this));
   }
+
+  this.loop = null;
+  this.nextTick();
 }
+
+Canvas.prototype.nextTick = function () {
+  for (var i = 0, length = this.queues.length; i < length; i++) {
+    var queue = this.queues[i];
+    if (!queue.isEmpty()) {
+      this.processCommand(queue.dequeue());
+    }
+  }
+  this.loop = window.setTimeout(this.nextTick.bind(this), 1);
+};
+
+Canvas.prototype.processCommand = function (cmdString) {
+  var data = cmdString.toString().split(',');
+  if (data.length === 4) {
+    // this is a line, draw it
+    this._line.apply(this, data);
+  } else {
+    // a single number represents a command
+    var cmd = this.cmds[data[0]].slice(0);
+    var func = '_' + cmd.shift();
+    console.log(func, cmd);
+    this[func].apply(this, cmd);
+  }
+};
 
 // map coordinates from window to canvas
 Canvas.prototype._mapCoords = function (x, y) {
@@ -93,22 +111,6 @@ Canvas.prototype._windowScrollPosition = function() {
   return { left: left, top: top };
 };
 
-Canvas.prototype.replay = function() {
-  this.recording.forEachTimeout(function (data) {
-    data = data.toString().split(',');
-    if (data.length === 4) {
-      // this is a line, draw it
-      this._line.apply(this, data);
-    } else {
-      // a single number represents a command
-      var cmd = this.cmds[data[0]];
-      var func = '_' + cmd.shift();
-      console.log(func, cmd);
-      this[func].apply(this, cmd);
-    }
-  }.bind(this), this.recordingInterval);
-};
-
 Canvas.prototype._startDrawing = function (e) {
   var coords = this._mapCoords(e.pageX, e.pageY);
   this.recordingLoop = window.setInterval(this._draw.bind(this), this.recordingInterval);
@@ -125,8 +127,7 @@ Canvas.prototype._stopDrawing = function () {
 };
 
 Canvas.prototype.setStrokeColor = function (color) {
-  this.recording.append(this.colors[color]);
-  this._setStrokeColor(color);
+  this.queue.queue(this.colors[color]);
 };
 
 Canvas.prototype._setStrokeColor = function (color) {
@@ -136,14 +137,13 @@ Canvas.prototype._setStrokeColor = function (color) {
 Canvas.prototype.registerStrokeColor = function(color) {
   if (!this.colors.hasOwnProperty(color)) {
     this.cmds.push([ 'setStrokeColor', color ]);
-    // save the cmd index so it canbe looked up by color
+    // save the cmd index so it can be looked up by color
     this.colors[color] = this.cmds.length - 1;
   }
 };
 
 Canvas.prototype.setStrokeWidth = function (width) {
-  this.recording.append(this.widths[width]);
-  this._setStrokeWidth(width);
+  this.queue.queue(this.widths[width]);
 };
 
 Canvas.prototype._setStrokeWidth = function (width) {
@@ -172,8 +172,7 @@ Canvas.prototype._draw = function() {
 };
 
 Canvas.prototype.line = function (x1, y1, x2, y2) {
-  this.recording.append([ Math.floor(x1), Math.floor(y1), Math.floor(x2), Math.floor(y2) ].join(','));
-  this._line(x1, y1, x2, y2);
+  this.queue.queue([ Math.floor(x1), Math.floor(y1), Math.floor(x2), Math.floor(y2) ].join(','));
 };
 
 Canvas.prototype._line = function (x1, y1, x2, y2) {
@@ -193,7 +192,7 @@ Canvas.prototype.undoTranslate = function () {
 };
 
 Canvas.prototype.newHistory = function () {
-  this.recording = new Recording();
+  this.queue = new Queue();
 };
 
 Canvas.prototype.erase = function () {
@@ -201,5 +200,5 @@ Canvas.prototype.erase = function () {
 };
 
 Canvas.prototype.fromString = function (data) {
-  this.recording.fromString(data);
+  this.queue.fromString(data);
 };
