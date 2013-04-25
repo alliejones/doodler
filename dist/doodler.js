@@ -72,16 +72,19 @@ Canvas.prototype.nextTick = function () {
   for (var id in this.queues) {
     var queue = this.queues[id];
     if (!queue.isEmpty()) {
-      this.processCommand(queue.dequeue());
+      this.processCommand(queue.dequeue(), queue.user);
     }
   }
   this.loop = window.setTimeout(this.nextTick.bind(this), 0);
 };
 
-Canvas.prototype.processCommand = function (cmdString) {
+Canvas.prototype.processCommand = function (cmdString, user) {
+  user = user || this.localQueue.user;
   var data = cmdString.toString().split(',');
   if (data.length === 4) {
     // this is a line, draw it
+    this._setStrokeColor(user.strokeColor);
+    this._setStrokeWidth(user.strokeWidth);
     this._line.apply(this, data);
   } else {
     // a single number represents a command
@@ -136,7 +139,7 @@ Canvas.prototype.setStrokeColor = function (color) {
   this.localQueue.queue(this.colors[color]);
 };
 
-Canvas.prototype._setStrokeColor = function (color) {
+Canvas.prototype._setStrokeColor = function (color, user) {
   this.ctx.strokeStyle = color;
 };
 
@@ -152,7 +155,7 @@ Canvas.prototype.setStrokeWidth = function (width) {
   this.localQueue.queue(this.widths[width]);
 };
 
-Canvas.prototype._setStrokeWidth = function (width) {
+Canvas.prototype._setStrokeWidth = function (width, user) {
   this.ctx.lineWidth = width;
 };
 

@@ -38,6 +38,7 @@
         height: 400,
         id: 'canvas'
       });
+      canvas.localQueue = new Queue();
       $('#clear').on('click', function() { canvas.erase(); canvas.newHistory(); });
       $('#replay').on('click', function() { canvas.erase(); canvas.replay(); });
 
