@@ -1,9 +1,11 @@
-function Queue () {
+function Queue (id, local) {
   this.array = [];
+  this.id = id;
+  this.local = local || false;
 }
 
 Queue.prototype.fromString = function(dataString) {
-  var data = dataString.split(',');
+  var data = dataString.toString().split(';');
   for (var i = 0, length = data.length; i < length; i++) {
     this.queue(data[i]);
   }
@@ -14,6 +16,7 @@ Queue.prototype.dequeue = function() {
 };
 
 Queue.prototype.queue = function(data) {
+  if (this.local) { wsChat.send(data, 'drawing'); }
   this.array.push(data);
 };
 

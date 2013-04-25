@@ -1,9 +1,11 @@
-function Queue () {
+function Queue (id, local) {
   this.array = [];
+  this.id = id;
+  this.local = local || false;
 }
 
 Queue.prototype.fromString = function(dataString) {
-  var data = dataString.split(',');
+  var data = dataString.toString().split(';');
   for (var i = 0, length = data.length; i < length; i++) {
     this.queue(data[i]);
   }
@@ -14,6 +16,7 @@ Queue.prototype.dequeue = function() {
 };
 
 Queue.prototype.queue = function(data) {
+  if (this.local) { wsChat.send(data, 'drawing'); }
   this.array.push(data);
 };
 
@@ -42,8 +45,8 @@ function Canvas (settings) {
   this.ctx.lineJoin = 'round';
   this.ctx.strokeStyle = 'black';
 
-  this.newHistory();
-  this.queues = [ this.queue ];
+  this.localQueue = null;
+  this.queues = {};
 
   this.cmds = [];
   this.colors = {};
@@ -61,14 +64,18 @@ function Canvas (settings) {
   this.nextTick();
 }
 
+Canvas.prototype.registerQueue = function (id, queue) {
+    this.queues[id] = queue;
+};
+
 Canvas.prototype.nextTick = function () {
-  for (var i = 0, length = this.queues.length; i < length; i++) {
-    var queue = this.queues[i];
+  for (var id in this.queues) {
+    var queue = this.queues[id];
     if (!queue.isEmpty()) {
       this.processCommand(queue.dequeue());
     }
   }
-  this.loop = window.setTimeout(this.nextTick.bind(this), 1);
+  this.loop = window.setTimeout(this.nextTick.bind(this), 0);
 };
 
 Canvas.prototype.processCommand = function (cmdString) {
@@ -80,7 +87,6 @@ Canvas.prototype.processCommand = function (cmdString) {
     // a single number represents a command
     var cmd = this.cmds[data[0]].slice(0);
     var func = '_' + cmd.shift();
-    console.log(func, cmd);
     this[func].apply(this, cmd);
   }
 };
@@ -127,7 +133,7 @@ Canvas.prototype._stopDrawing = function () {
 };
 
 Canvas.prototype.setStrokeColor = function (color) {
-  this.queue.queue(this.colors[color]);
+  this.localQueue.queue(this.colors[color]);
 };
 
 Canvas.prototype._setStrokeColor = function (color) {
@@ -143,7 +149,7 @@ Canvas.prototype.registerStrokeColor = function(color) {
 };
 
 Canvas.prototype.setStrokeWidth = function (width) {
-  this.queue.queue(this.widths[width]);
+  this.localQueue.queue(this.widths[width]);
 };
 
 Canvas.prototype._setStrokeWidth = function (width) {
@@ -172,7 +178,7 @@ Canvas.prototype._draw = function() {
 };
 
 Canvas.prototype.line = function (x1, y1, x2, y2) {
-  this.queue.queue([ Math.floor(x1), Math.floor(y1), Math.floor(x2), Math.floor(y2) ].join(','));
+  this.localQueue.queue([ Math.floor(x1), Math.floor(y1), Math.floor(x2), Math.floor(y2) ].join(','));
 };
 
 Canvas.prototype._line = function (x1, y1, x2, y2) {
@@ -191,14 +197,10 @@ Canvas.prototype.undoTranslate = function () {
   this.ctx.restore();
 };
 
-Canvas.prototype.newHistory = function () {
-  this.queue = new Queue();
-};
-
 Canvas.prototype.erase = function () {
   this.ctx.clearRect(0, 0, this.el.width, this.el.height);
 };
 
 Canvas.prototype.fromString = function (data) {
-  this.queue.fromString(data);
+  this.localQueue.fromString(data);
 };
